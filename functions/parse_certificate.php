@@ -280,7 +280,7 @@ function get_cert_cn($raw_cert_data){
                 if ( array_search(explode("Policy: ", explode("\n", $cert_data['extensions']['certificatePolicies'])[0])[1], $ev_oids) ) {
                   echo '<span class="text-success">Extended Validation</span>';
                 } else if ( isset($cert_data['subject']['O'] ) ) {
-                  echo "Organisation Validation";
+                  echo "Organization Validation";
                 } else if ( isset($cert_data['subject']['CN'] ) ) {
                   echo "Domain Validation";
                 }
