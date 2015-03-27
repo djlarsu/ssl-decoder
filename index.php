@@ -115,7 +115,7 @@ foreach (glob("functions/*.php") as $filename) {
                 <div class="form-group">
                   <label class="col-md-1 control-label" for="host">Host</label>  
                   <div class="col-md-5">
-                    <input id="host" name="host" type="text" placeholder="raymii.org" class="form-control input-md" >
+                    <input id="host" name="host" type="text" placeholder="www.godaddy.com" class="form-control input-md" >
                   </div>
                   <label class="col-md-1 control-label" for="port">Port</label>  
                   <div class="col-md-2">
