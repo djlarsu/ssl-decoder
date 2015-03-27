@@ -75,6 +75,7 @@ foreach (glob("functions/*.php") as $filename) {
     <nav>
     <ul class="sidebar-nav">
     <br>
+      <img src="https://img1.wsimg.com/fos/hp/rebrand/img/gd_rebrand_og.png"><br>
       <li class="sidebar-brand">
         <h2>Navigation</h2>
       </li>

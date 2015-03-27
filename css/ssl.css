@@ -26,13 +26,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 .nav-active {
     text-decoration: none;
     color: #fff !important;
-    background: rgba(0,150,255,0.7);
+    background: rgba(119,192,67,0.7);
 }
 
 .nav-active a{
     text-decoration: none;
     color: #fff;
-    background: rgba(0,150,255,0.7);
+    background: rgba(119,192,67,0.7);
 }
 
 #wrapper {
@@ -44,11 +44,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   margin-left: -250px;
   left: 250px;
   width: 250px;
-  background: #f9f9f9;
+  background: #ffffff;
   position: fixed;
   border-right-style: solid;
   border-right-width: 1px;
-  border-right-color: #ddd;
+  border-right-color: #dedede;
   height: 100%;
   overflow-y: auto;
   z-index: 1000;
@@ -83,7 +83,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 .sidebar-nav li a:hover {
     text-decoration: none;
     color: #fff;
-    background: rgba(0,150,255,0.7);
+    background: rgba(119,192,67,0.7);
 }
 
 .sidebar-nav li a:active,
