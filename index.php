@@ -87,11 +87,7 @@ foreach (glob("functions/*.php") as $filename) {
       ?>
       <li><a href="<?php echo(htmlspecialchars($current_folder)); ?>">Try another website</a></li>
       <li><hr></li>
-      <li><a href="https://cipherli.st/">Strong Cipherlists</a></li>
-      <li><a href="https://raymii.org/s/tutorials/Strong_SSL_Security_On_Apache2.html">Apache SSL Tutorial</a></li>
-      <li><a href="https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html">NGINX SSL Tutorial</a></li>
-      <li><a href="https://raymii.org/s/tutorials/Strong_SSL_Security_On_lighttpd.html">Lighttpd SSL Tutorial</a></li>
-      <li><a href="https://raymii.org">Raymii.org</a></li>
+      <li><a href="https://confluence.int.godaddy.com/display/GDKB/SSL+Configuration">SSL Recommendations</a></li>
     </ul>
     </nav>
   </div>
@@ -314,7 +310,7 @@ foreach (glob("functions/*.php") as $filename) {
     ?>
       <div class="footer">
         <div class="col-md-6 col-md-offset-1 container">
-          <p class="text-muted">By <a href="https://raymii.org/s/software/OpenSSL_Decoder.html">Remy van Elst</a>. License: GNU AGPLv3. <a href="https://github.com/RaymiiOrg/ssl-decoder">Source code</a>. <strong><a href="https://cipherli.st/">Strong SSL Ciphers & Config settings @ Cipherli.st</a></strong>. Version: 1.9</p>
+          <p class="text-muted">By <a href="https://raymii.org/s/software/OpenSSL_Decoder.html">Remy van Elst</a>. License: GNU AGPLv3. <a href="https://github.secureserver.net/linux-shared-services/ssldecoder">Source code</a>. <strong><a href="https://confluence.int.godaddy.com/display/GDKB/SSL+Configuration">SSL Recommendations</a></strong>. Version: 1.9</p>
         </div>
       </div>
     </div>
