@@ -176,7 +176,7 @@ function ssl_conn_metadata($host, $port, $chain=null) {
               $certificate_chain = array();
               if ($chain_length <= 10) {
                 for ($i = 0; $i < $chain_length; $i++) {
-                  if (openssl_x509_parse($chain[$i])['issuer']['CN'] && openssl_x509_parse($chain[$i])['subject']['CN']) {
+                  if ($i > 0 || (openssl_x509_parse($chain[$i])['issuer']['CN'] && openssl_x509_parse($chain[$i])['subject']['CN'])) {
                     echo "Name...........: <i>";
                     echo htmlspecialchars(openssl_x509_parse($chain[$i])['subject']['CN']);
                     echo " </i><br>Issued by......:<i> ";
@@ -649,7 +649,7 @@ function ssl_conn_metadata_json($host, $port, $read_stream, $chain_data=null) {
       $certificate_chain = array();
       if ($chain_length <= 10) {
         for ($i = 0; $i < $chain_length; $i++) {
-          if (openssl_x509_parse($chain_data[$i])['issuer']['CN'] && openssl_x509_parse($chain_data[$i])['subject']['CN']) {
+          if ($i > 0 || (openssl_x509_parse($chain_data[$i])['issuer']['CN'] && openssl_x509_parse($chain_data[$i])['subject']['CN'])) {
             $result["chain"][$i]["name"] = openssl_x509_parse($chain_data[$i])['subject']['CN'];
             $result["chain"][$i]["issuer"] = openssl_x509_parse($chain_data[$i])['issuer']['CN'];
             $export_pem = "";
