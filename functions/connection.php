@@ -659,7 +659,7 @@ function ssl_conn_metadata_json($host, $port, $read_stream, $chain_data=null) {
       $certificate_chain = array();
       if ($chain_length <= 10) {
         for ($i = 0; $i < $chain_length; $i++) {
-          if (openssl_x509_parse($chain_data[$i])['issuer'] && openssl_x509_parse($chain_data[$i])['subject'])) {
+          if (openssl_x509_parse($chain_data[$i])['issuer'] && openssl_x509_parse($chain_data[$i])['subject']) {
             $result["chain"][$i]["subject"] = openssl_x509_parse($chain_data[$i])['subject'];
             $result["chain"][$i]["issuer"] = openssl_x509_parse($chain_data[$i])['issuer'];
             $export_pem = "";
