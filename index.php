@@ -62,7 +62,7 @@ foreach (glob("functions/*.php") as $filename) {
         "verify_peer_name" => false,
         "allow_self_signed" => true,
         "sni_enabled" => true)));
-      $read_stream = stream_socket_client("ssl://$host:$port", $errno, $errstr, 5, STREAM_CLIENT_CONNECT, $stream);
+      $read_stream = stream_socket_client("ssl://$host:$port", $errno, $errstr, 2, STREAM_CLIENT_CONNECT, $stream);
       if ( $read_stream !== false ) {
         $context = stream_context_get_params($read_stream);
         $chain_data = $context["options"]["ssl"]["peer_certificate_chain"];
@@ -201,7 +201,7 @@ foreach (glob("functions/*.php") as $filename) {
                   "verify_peer_name" => false,
                   "allow_self_signed" => true,
                   "sni_enabled" => true)));
-              $read_stream = stream_socket_client("ssl://$host:$port", $errno, $errstr, 5,
+              $read_stream = stream_socket_client("ssl://$host:$port", $errno, $errstr, 2,
                 STREAM_CLIENT_CONNECT, $stream);
 
               if ( $read_stream === false ) {

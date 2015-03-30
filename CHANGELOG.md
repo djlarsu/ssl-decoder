@@ -1,9 +1,25 @@
 # Changelog
 
+## 2.1
+
+- Add json API endpoint (see README)
+- Rewrote internals to use same endpoint
+- Don't follow redirects during HTTP header gathering.
+
+## 2.0
+
+- Add TLS_FALLBACK_SCSV check
+- Lower some timeouts from 5 to 2.
+
 ## 1.9
 
 - Add navigation menu
+- Add green color if HSTS/HPKP headers are available.
+- Partial fix to make IDN's work instead of fail.
 - Fix issue with OCSP validation and HTTP 1.1 (StartCOM)
+- Fix CRL validation issue for self signed CRL URI's
+- Fix http header case sensitive validation (HSTS, HPKP)
+- Fix OCSP status display
 - Relicense under Affero GPL
 
 ## 1.8
