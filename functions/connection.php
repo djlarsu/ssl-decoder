@@ -176,18 +176,28 @@ function ssl_conn_metadata($host, $port, $chain=null) {
               $certificate_chain = array();
               if ($chain_length <= 10) {
                 for ($i = 0; $i < $chain_length; $i++) {
-                  if ($i > 0 || (openssl_x509_parse($chain[$i])['issuer']['CN'] && openssl_x509_parse($chain[$i])['subject']['CN'])) {
+                  if (openssl_x509_parse($chain[$i])['issuer'] && openssl_x509_parse($chain[$i])['subject']) {
+                    $subject=openssl_x509_parse($chain[$i])['subject'];
+                    $issuer=openssl_x509_parse($chain[$i])['issuer'];
                     echo "Name...........: <i>";
-                    echo htmlspecialchars(openssl_x509_parse($chain[$i])['subject']['CN']);
+                    if ($subject['CN']) {
+                      echo htmlspecialchars($subject['CN']);
+                    } else {
+                      echo htmlspecialchars(implode(', ', array_map(function ($v, $k) { return $k . '=' . $v; }, $subject, array_keys($subject))));
+                    }
                     echo " </i><br>Issued by......:<i> ";
-                    echo htmlspecialchars(openssl_x509_parse($chain[$i])['issuer']['CN']);
+                    if ($issuer['CN']) {
+                      echo htmlspecialchars($issuer['CN']);
+                    } else {
+                      echo htmlspecialchars(implode(', ', array_map(function ($v, $k) { return $k . '=' . $v; }, $issuer, array_keys($issuer))));
+                    }
                     echo "</i><br>";
 
                     $export_pem = "";
                     openssl_x509_export($chain[$i], $export_pem);
                     array_push($certificate_chain, $export_pem);
 
-                    if (openssl_x509_parse($chain[$i])['issuer']['CN'] == openssl_x509_parse($chain[$i + 1])['subject']['CN']){
+                    if (openssl_x509_parse($chain[$i])['issuer'] == openssl_x509_parse($chain[$i + 1])['subject']){
                       continue;
                     } else {
                       if ($i != $chain_length - 1) {
@@ -649,17 +659,17 @@ function ssl_conn_metadata_json($host, $port, $read_stream, $chain_data=null) {
       $certificate_chain = array();
       if ($chain_length <= 10) {
         for ($i = 0; $i < $chain_length; $i++) {
-          if ($i > 0 || (openssl_x509_parse($chain_data[$i])['issuer']['CN'] && openssl_x509_parse($chain_data[$i])['subject']['CN'])) {
-            $result["chain"][$i]["name"] = openssl_x509_parse($chain_data[$i])['subject']['CN'];
-            $result["chain"][$i]["issuer"] = openssl_x509_parse($chain_data[$i])['issuer']['CN'];
+          if (openssl_x509_parse($chain_data[$i])['issuer'] && openssl_x509_parse($chain_data[$i])['subject'])) {
+            $result["chain"][$i]["subject"] = openssl_x509_parse($chain_data[$i])['subject'];
+            $result["chain"][$i]["issuer"] = openssl_x509_parse($chain_data[$i])['issuer'];
             $export_pem = "";
             openssl_x509_export($chain_data[$i], $export_pem);
             array_push($certificate_chain, $export_pem);
-            if (openssl_x509_parse($chain_data[$i])['issuer']['CN'] == openssl_x509_parse($chain_data[$i + 1])['subject']['CN']){
+            if (openssl_x509_parse($chain_data[$i])['issuer'] == openssl_x509_parse($chain_data[$i + 1])['subject']){
               continue;
             } else {
               if ($i != $chain_length - 1) {
-                $result["chain"][$i]["error"] = "Issuer does not match the next certificate CN. Chain order is probaby wrong.";
+                $result["chain"][$i]["error"] = "Issuer does not match the next certificate Subject. Chain order is probably wrong.";
               }
             }
           }
