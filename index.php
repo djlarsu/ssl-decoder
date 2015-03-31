@@ -88,14 +88,6 @@ foreach (glob("functions/*.php") as $filename) {
           echo "<li><a href='#cert".(string)$key."'><strong>".$key."</strong> : ". htmlspecialchars($value["cert_data"]["subject"]["CN"]) . $warntxt . "</a></li>";
         }
         ?>
-        
-
-
-<div class="col-md-6 col-md-offset-1 container">
-          <p class="text-muted">By <a href="https://raymii.org/s/software/OpenSSL_Decoder.html">Remy van Elst</a>. License: GNU AGPLv3. <a href="https://github.secureserver.net/linux-shared-services/ssldecoder">Source code</a>. <strong><a href="https://confluence.int.godaddy.com/display/GDKB/SSL+Configuration">SSL Recommendations</a></strong>. Version: 1.9</p>
-        </div>
-      </div>
-    </div>
         <li><a href="<?php echo(htmlspecialchars($current_folder)); ?>">Try another website</a></li>
         <li><hr></li>
         <li><a href="https://github.secureserver.net/linux-shared-services/ssldecoder">Source Code</a></li>
