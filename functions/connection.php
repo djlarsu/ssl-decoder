@@ -473,7 +473,7 @@ function ssl_conn_metadata_json($host, $port, $read_stream, $chain_data=null) {
         }
       } else {
         if ( $key == "tlsv1.2") {
-          $result["warning"][] = 'TLSv1.2 unsupported. Please enable TLSv1.2.';
+          //$result["warning"][] = 'TLSv1.2 unsupported. Please enable TLSv1.2.';
         }
       }
     }
@@ -632,7 +632,7 @@ function ssl_conn_metadata_json($host, $port, $read_stream, $chain_data=null) {
       }
     } else {
       $result["strict_transport_security"] = 'not set';
-      $result["warning"][] = "HTTP Strict Transport Security not set.";
+      //$result["warning"][] = "HTTP Strict Transport Security not set.";
     }
     //hpkp
     if ( $headers["public-key-pins"] ) {
@@ -657,7 +657,7 @@ function ssl_conn_metadata_json($host, $port, $read_stream, $chain_data=null) {
       $result["ocsp_stapling"] = $stapling;
     } else {
       $result["ocsp_stapling"] = "not set";
-      $result["warning"][] = "OCSP Stapling not enabled.";
+      //$result["warning"][] = "OCSP Stapling not enabled.";
     }
     
     $result["openssl_version"] = shell_exec("openssl version");
