@@ -832,7 +832,7 @@ function cert_parse_json($raw_cert_data, $raw_next_cert_data=null, $host=null, $
   }
   // signature algorithm
   $result["key"]["signature_algorithm"] = cert_signature_algorithm($raw_cert_data);
-  if ($result["key"]["signature_algorithm"] == "sha1WithRSAEncryption") {
+  if ($result["key"]["signature_algorithm"] == "sha1WithRSAEncryption" && strtotime(date(DATE_RFC2822,$cert_data['validTo_time_t'])) > strtotime('1 January 2016') && $validate_hostname == true ) {
     $result['warning'][] = "SHA-1 certificate. Upgrade (re-issue) to SHA-256 or better.";
   }
   if(isset($export_pem)) {
