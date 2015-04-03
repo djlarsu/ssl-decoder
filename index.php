@@ -90,7 +90,7 @@ foreach (glob("functions/*.php") as $filename) {
         ?>
         <li><a href="<?php echo(htmlspecialchars($current_folder)); ?>">Try another website</a></li>
         <li><hr></li>
-        <li><a href="https://github.secureserver.net/linux-shared-services/ssldecoder">Source Code</a></li>
+        <li><a href="https://github.secureserver.net/IDSVC/ssldecoder">Source Code</a></li>
         <li><a href="https://confluence.int.godaddy.com/display/GDKB/SSL+Configuration">SSL Recommendations</a></li>
       </ul>
     </nav>
