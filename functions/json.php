@@ -49,7 +49,7 @@ function check_json($host,$port) {
         } else {
           $data["chain"][$chain_key] = cert_parse_json($curr, $next, null, false);
         }
-      }
+      } 
     } else {
       $data["error"] = ["Chain too long."];
       return $data;
