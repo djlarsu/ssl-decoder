@@ -20,7 +20,7 @@ $timeout = 2;
 # Don't change stuff down here.
 date_default_timezone_set('UTC');
 
-$version = 2.5;
+$version = 2.6;
 
 ini_set('default_socket_timeout', 2);
 
@@ -50,9 +50,7 @@ function parse_hostname($u_hostname){
         $parts[1] = preg_replace('/[^A-Za-z0-9\.\:_-]/', '', $parts[1]);
         if (filter_var($parts[1], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ) or filter_var($parts[1], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 )) {
             $ip = mb_strtolower($parts[1]);
-        } else {
-            $ip = fixed_gethostbyname($hostname);
-        }
+        } 
     } else {
         if (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 )) {
             $ip = $hostname;
@@ -60,7 +58,7 @@ function parse_hostname($u_hostname){
             $dns_a_records = dns_get_record($hostname, DNS_A);
             $dns_aaaa_records = dns_get_record($hostname, DNS_AAAA);
             $dns_records = array_merge($dns_a_records, $dns_aaaa_records);
-            if (count($dns_a_records) > 1 or count($dns_aaaa_records) > 1) {
+            if (count($dns_a_records) > 1 or count($dns_aaaa_records) > 1 or (count($dns_a_records) + count($dns_aaaa_records) > 1)) {
                 $result = array('hostname' => $hostname, 'ip' => $ip, 'multiple_ip' => $dns_records);
                 return $result;
             } else {
@@ -100,7 +98,7 @@ function choose_endpoint($ips, $host, $port, $ciphersuites) {
     echo "</p>\n";
     echo "</div>\n";
     echo "<div id='resultDiv'></div>\n";
-
+    echo "<div class='alert alert-info' role='alert'>Because of upcoming <a href='https://www.openprovider.co.uk/about-openprovider/news/upcoming-changes-somalian-so-domains'>.so TLD changes</a>, the SSL decoder's new domain is <a href='https://ssldecoder.org'>ssldecoder.org</a>. Please update your bookmarks.</div>";
     echo "<div class='content'>\n<section id='choose_endpoint'>\n";
     echo "<header>\n<h2>Multiple endpoints for " . htmlspecialchars($host) . "</h2>\n</header>\n";
     echo "<p>We've found multiple results for " . htmlspecialchars($host) . ". Please choose the host you want to scan from the list below:</p>\n<br>\n";
