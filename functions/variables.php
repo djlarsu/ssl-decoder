@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # timeout in seconds
-$timeout = 2;
+$timeout = 5;
 
 # Don't change stuff down here.
 date_default_timezone_set('UTC');
