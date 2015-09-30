@@ -30,7 +30,7 @@ foreach (glob("functions/*.php") as $filename) {
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSL Decoder</title>
+  <title>SSL Decoder</title>  
   <link rel="stylesheet" href="<?php echo(htmlspecialchars($current_folder)); ?>css/bootstrap.min.css">
   <link rel="stylesheet" href="<?php echo(htmlspecialchars($current_folder)); ?>css/ssl.css">
   <script src="<?php echo(htmlspecialchars($current_folder)); ?>js/jquery.min.js"></script> 
@@ -79,15 +79,18 @@ foreach (glob("functions/*.php") as $filename) {
             $warntxt = " <sup>(<strong>".htmlspecialchars(count(array_unique($data["data"]["connection"]["warning"])))."</strong>)</sup>";
           }
         ?>
-        <li><a href="#conndata"><strong>0</strong>: Connection Data <?php echo $warntxt; ?></a></li>
+        <li><a href="#conndata"><strong>0</strong>: Connection Data <?php echo $warntxt; $warntxt = ''; ?></a></li>
         <?php
         foreach ($chain_data as $key => $value) {
           if (count($value['warning']) >= 1) {
             $warntxt = " <sup>(<strong>".htmlspecialchars(count($value['warning']))."</strong>)</sup>";
           }
           echo "<li><a href='#cert".(string)$key."'><strong>".$key."</strong> : ". htmlspecialchars($value["cert_data"]["subject"]["CN"]) . $warntxt . "</a></li>";
+          $warntxt = "";
         }
         ?>
+        <li><a href="#ctsubmit">Certificate Transparency</a></li>
+
         <li><a href="<?php echo(htmlspecialchars($current_folder)); ?>">Try another website</a></li>
         <li><hr></li>
         <li><a href="https://github.secureserver.net/IDSVC/ssldecoder">Source Code</a></li>
@@ -124,25 +127,31 @@ foreach (glob("functions/*.php") as $filename) {
     }
   
     if ( !empty($host) ) {
-      echo "<p><strong>This tool does not make conclusions. Please check the data and define the validity yourself!</strong></p>";
       if ( !empty($data["error"]) ) {
         echo "<span class='text-danger'>" . htmlspecialchars($data["error"][0]) . "</span>";
         echo "<hr>";
         $write_cache = 0;
       } else {
+
         $hostfilename = preg_replace("([^\w\s\d\-_~,;:\[\]\(\).])", '', $host);
         $hostfilename = preg_replace("([\.]{2,})", '', $host);
         $hostfilename = preg_replace("([^a-z0-9])", '', $host);
         $cache_filename = (string) "results/saved." . $hostfilename . "." . $epoch . "." . $random_bla . ".html";
         $cache_filename_json = (string) "results/saved." . $hostfilename . "." . $epoch . "." . $random_bla . ".json";
 
+        echo "<p><strong>This tool does not make conclusions. Please check the data and define the validity yourself!</strong></p>";
+
         if ($write_cache == 1) {
-          echo "This result is saved at most 60 days on <a href=\"";
+          echo "<p>This result is saved at most 60 days on <a href=\"";
           echo(htmlspecialchars($current_folder) . $cache_filename); 
-          echo "\">the following URL</a>. Do note that this might be deleted earlier if space runs out.";
+          echo "\">the following URL</a>. Do note that this might be deleted earlier if space runs out.<br></p>";
         }
 
-        // connection data
+        echo "<script type='text/javascript'>document.title = \"" . htmlspecialchars($host) . ":" . htmlspecialchars($port) . " - SSL Decoder \"</script>";
+
+        echo "<p>Receive notifications when this certificate is about to expire with my other service, <a href='https://certificatemonitor.org/'>Certificate Monitor</a>.</p>";
+
+      // connection data
         echo "<div class='content'><section id='conndata'>";
         echo "<header><h2>Connection Data for " . htmlspecialchars($host) . " / " . htmlspecialchars($ip) . "</h2></header>";
         ssl_conn_metadata($data["data"]["connection"]);
@@ -155,7 +164,38 @@ foreach (glob("functions/*.php") as $filename) {
           cert_parse($value);
           echo "</section></div>";
         }
-      }     
+
+        // submit to certificate transparency
+        echo "<div class='content'><section id='ctsubmit'>";
+        echo "<header><h2>Certificate Transparency Submission</h2></header>";
+        echo "<p><a href='http://www.certificate-transparency.org/'>Information about Certificate Transparency</a></p>";
+        foreach ($ct_urls as $ct_url) {
+          echo "<table class='table table-striped table-bordered'>";
+          echo "<tr><td>CT Log URL</td><td>" . htmlspecialchars($ct_url) . "</td></tr>";
+          $submitToCT = submitCertToCT($data["data"]["chain"], $ct_url);
+          $ct_result = json_decode($submitToCT, TRUE);
+          if ($ct_result === null
+            && json_last_error() !== JSON_ERROR_NONE) {
+            echo "<tr><td width='20%'>Result</td><td width='80%' style='font-family:monospace;'>". htmlspecialchars($submitToCT) . "</td></tr>";
+          } else {
+            if (is_array($ct_result)) {
+              foreach ($ct_result as $key => $value) {
+                if (is_bool($key)) {
+                  $key = ($key) ? 'True' : 'False';
+                }
+                if (is_bool($value)) {
+                  $value = ($value) ? 'True' : 'False';
+                }
+
+                echo "<tr><td width='20%'>" . htmlspecialchars(ucfirst(str_replace('_', ' ', $key))) . "</td><td width='80%' style='font-family:monospace;'>" . wordwrap(htmlspecialchars($value), 65, "<br />", 1) . "</td></tr>";
+                
+              } 
+            }
+          }
+          echo "</table>";
+        }
+        echo "</section></div>";
+      }
     } elseif (!empty($_GET['csr']) ) {
       $data = csr_parse_json($_GET['csr']);
       echo "<p><strong>This tool does not make conclusions. Please check the data and define the validity yourself!</strong><br>\n &nbsp;</p>";

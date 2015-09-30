@@ -14,6 +14,37 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+function submitCertToCT($chain, $ct_url) {
+  $ct_chain = array('chain' => []);
+  foreach ($chain as $key => $value) {
+    $string = $value['key']['certificate_pem'];
+    $pattern = '/-----(.*)-----/';
+    $replacement = '';
+    $string = preg_replace($pattern, $replacement, $string);
+    $pattern = '/\n/';
+    $replacement = '';
+    $string = preg_replace($pattern, $replacement, $string);
+    array_push($ct_chain['chain'], $string);    
+  }
+  $post_data = json_encode($ct_chain);
+  $ch = curl_init();  
+  curl_setopt($ch, CURLOPT_URL, $ct_url . "/ct/v1/add-chain");
+  curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+  curl_setopt($ch, CURLOPT_NOBODY, true);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_FAILONERROR, false);
+  curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, true);
+  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+  curl_setopt($ch, CURLOPT_HEADER, false); 
+  curl_setopt($ch, CURLOPT_POST, count($post_data));
+  curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);    
+  $ct_output = curl_exec($ch);
+  curl_close($ch);
+  return $ct_output;
+}
+
 function fixed_gethostbyname($host) {
   $ips = dns_get_record($host, DNS_A + DNS_AAAA);
   sort($ips);
@@ -130,6 +161,23 @@ function test_heartbleed($ip, $port) {
     }
   } else {
     $result = "python2error";
+  }
+  return $result;
+}
+
+function heartbeat_test($host, $port) {
+  global $random_blurp, $timeout;
+  $result = 0;
+
+  //pre_dump('echo | timeout ' . $timeout . ' openssl s_client -connect ' . escapeshellcmd($host) . ':' . escapeshellcmd($port) . ' -servername ' . escapeshellcmd($host) . ' -tlsextdebug 2>&1 &lt; /dev/null | awk -F\" \'/server extension/ {print $2}\'');
+
+  $output = shell_exec('echo | timeout ' . $timeout . ' openssl s_client -connect ' . escapeshellcmd($host) . ':' . escapeshellcmd($port) . ' -servername ' . escapeshellcmd($host) . ' -tlsextdebug 2>&1 </dev/null | awk -F\" \'/server extension/ {print $2}\'');
+
+  $output = preg_replace("/[[:blank:]]+/"," ", $output);
+  $output = explode("\n", $output);
+  $output = array_map('trim', $output);
+  if ( in_array("heartbeat", $output) ) {
+    $result = 1;
   }
   return $result;
 }
@@ -474,6 +522,20 @@ function ssl_conn_metadata($data) {
     echo "</tr>";
   }
 
+  echo "<tr>";
+  echo "<td>";
+  echo "Heartbeat Extension";
+  echo "</td>";
+  echo "<td>";
+
+  if ($data["heartbeat"] == "1") {
+    echo "Extension enabled.";
+  } else {
+    echo "Extenstion not enabled.";
+  } 
+  echo "</td>";
+  echo "</tr>";
+
   // headers
   echo "<tr>";
   echo "<td>";
@@ -519,7 +581,7 @@ function ssl_conn_metadata($data) {
       echo "<table class='table'>";
       foreach ($data["ocsp_stapling"] as $key => $value) {
         if ($key != "working") {
-          echo "<tr><td>" . htmlspecialchars($key) . "</td><td>" . htmlspecialchars($value) . "</td></tr>";
+          echo "<tr><td>" . htmlspecialchars(ucfirst(str_replace('_', ' ', $key))) . "</td><td>" . htmlspecialchars($value) . "</td></tr>";
         }
       } 
       echo "</table>";
@@ -530,6 +592,7 @@ function ssl_conn_metadata($data) {
     echo "<span class='text-danger glyphicon glyphicon-remove'></span> - <span class='text-danger'>No OCSP stapling response received.</span>";
   }
   echo "</td>";
+
   // openssl version
   echo "</tr>";
   echo "<tr>";
@@ -856,6 +919,8 @@ function ssl_conn_metadata_json($host, $ip, $port, $read_stream, $chain_data=nul
       }
     }
     
+    $result["heartbeat"] = heartbeat_test($host, $port);
+
     $result["openssl_version"] = shell_exec("openssl version");
     $result["datetime_rfc2822"] = shell_exec("date --rfc-2822");
   } 

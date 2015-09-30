@@ -252,8 +252,9 @@ function cert_parse($data) {
   echo "<td>";
   foreach ( explode("DNS:", $data['cert_data']['extensions']['subjectAltName']) as $altName ) {
     if ( !empty(str_replace(',', " ", "$altName"))) {
+      echo "<span style='font-family:monospace;'>";
       echo htmlspecialchars(str_replace(',', " ", "$altName"));
-      echo "<br>";
+      echo "</span><br>";
     }
   } 
   echo "</td>";
@@ -275,9 +276,9 @@ function cert_parse($data) {
   echo "</tr>";
   echo "<tr>";
   echo "<td>Full Subject</td>";
-  echo "<td>";
+  echo "<td><span style='font-family:monospace;'>";
   echo htmlspecialchars($data['cert_data']['name']);
-  echo "</td>";
+  echo "</span></td>";
   echo "</tr>";
   echo "<tr>";
   echo "<td colspan='2'><strong>Issuer</strong></td>";
@@ -503,7 +504,7 @@ function cert_parse($data) {
     echo "<tr>";
     echo "<td>Serial</td>";
     echo "<td>";
-    echo htmlspecialchars($data['serialNumber']);
+    echo "<span style='font-family:monospace;'>" . htmlspecialchars($data['serialNumber']) . "</span>";
     echo "</td>";
     echo "</tr>";
   }
@@ -515,6 +516,20 @@ function cert_parse($data) {
   echo " bits ";
   echo htmlspecialchars($data["key"]['type']);
   echo "</td>";
+  echo "</tr>";
+  echo "<tr>";
+  echo "<td>";
+  echo "Weak debian key";
+  echo "</td>";
+  if ($data["key"]["weak_debian_rsa_key"] == 1) {
+    echo "<td>";
+    echo "<span class='text-danger glyphicon glyphicon-exclamation-sign'></span><span class='text-danger'> - This is a <a href='https://wiki.debian.org/SSLkeys'>weak debian key</a>. Replace it as soon as possible.</span>";
+    echo "</td>";
+  } else {
+    echo "<td>";
+    echo "This is not a <a href='https://wiki.debian.org/SSLkeys'>weak debian key</a>.";
+    echo "</td>";
+  }
   echo "</tr>";
   echo "<tr>";
   echo "<td>Signature Algorithm</td>";
@@ -619,7 +634,7 @@ function cert_parse($data) {
     echo "<tr>";
     echo "<td><a href='https://raymii.org/s/articles/HTTP_Public_Key_Pinning_Extension_HPKP.html'>SPKI Hash</a></td>";
     echo "<td>";
-    print(htmlspecialchars($data['key']['spki_hash']));
+    print("<span style='font-family:monospace;'>" . htmlspecialchars($data['key']['spki_hash']) . "</span>");
     echo "</td>";
     echo "</tr>";
   }
@@ -821,12 +836,37 @@ function cert_parse_json($raw_cert_data, $raw_next_cert_data=null, $host=null, $
   // key details
   $key_details = openssl_pkey_get_details(openssl_pkey_get_public($raw_cert_data));
   $export_pem = "";
+
   openssl_x509_export($raw_cert_data, $export_pem);
   if (isset($key_details['rsa'])) {
     $result["key"]["type"] = "rsa";
     $result["key"]["bits"] = $key_details['bits'];
     if ($key_details['bits'] < 2048) {
       $result['warning'][] = $key_details['bits'] . " bit RSA key is not safe. Upgrade to at least 4096 bits.";
+    }
+    // weak debian key check
+    $bin_modulus = $key_details['rsa']['n'];
+    # blacklist format requires sha1sum of output from "openssl x509 -noout -modulus" including the Modulus= and newline.
+    # create the blacklist:
+    # https://packages.debian.org/source/squeeze/openssl-blacklist
+    # svn co svn://svn.debian.org/pkg-openssl/openssl-blacklist/
+    # find openssl-blacklist/trunk/blacklists/ -iname "*.db" -exec cat {} >> unsorted_blacklist.db \;
+    # sort -u unsorted_blacklist.db > debian_blacklist.db
+
+    $mod_sha1sum = sha1("Modulus=" . strtoupper(bin2hex($bin_modulus)) . "\n");
+    #pre_dump($mod_sha1sum);
+    $blacklist_file = fopen('inc/debian_blacklist.db', 'r');
+    $key_in_blacklist = false;
+    while (($buffer = fgets($blacklist_file)) !== false) {
+        if (strpos($buffer, $mod_sha1sum) !== false) {
+            $key_in_blacklist = true;
+            break; 
+        }      
+    }
+    fclose($blacklist_file);
+    if ($key_in_blacklist == true) {
+      $result["key"]["weak_debian_rsa_key"] = "true";
+      $result['warning'][] = "Weak Debian key found. Remove this key right now and create a new one.";
     }
   } else if (isset($key_details['dsa'])) {
     $result["key"]["type"] = "dsa";

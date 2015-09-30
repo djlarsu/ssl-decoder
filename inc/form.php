@@ -7,12 +7,12 @@
         </div>
         <div id='sslform'>
           <form class="form-horizontal">
-            <p>Fill in either host + port or paste a CSR/Certficiate. Port defaults to 443.<br></p>
+            <p>Fill in either host + port or paste a CSR/Certficiate. Port defaults to 443. <br></p>
             <fieldset>
               <div class="form-group">
-                <label class="col-md-1 control-label" for="host">Host</label>  
+                <label class="col-md-1 control-label" for="host">Host </label>  
                 <div class="col-md-5">
-                  <input id="host" name="host" type="text" placeholder="www.godaddy.com" class="form-control input-md" >
+                  <input id="host" name="host" type="text" placeholder="www.godaddy.com" autofocus="autofocus" class="form-control input-md" >
                 </div>
                 <label class="col-md-1 control-label" for="port">Port</label>  
                 <div class="col-md-2">
